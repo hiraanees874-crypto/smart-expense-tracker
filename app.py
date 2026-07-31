@@ -41,19 +41,12 @@ try:
         "expenses.csv", names=["Date", "Item", "Amount", "Category"]
     )
 
-    # Total Spent Metric
-    total_spent = df["Amount"].sum()
-    st.metric(label="Total Spent", value=f"Rs. {total_spent}")
-
-    # History Table
-    st.subheader("📋 Expense History")
-    st.dataframe(df, use_container_width=True)
-
-    # Category Wise Chart
-    st.subheader("📈 Category Breakdown")
-    cat_summary = df.groupby("Category")["Amount"].sum()
-    st.bar_chart(cat_summary)
-
+    
+      # History Table
+    edited_df = st.data_editor(df, num_rows="dynamic", use_container_width=True)
+total_spent = edited_df["Amount"].sum()
+st.metric(label="Total Spent", value=f"Rs. {total_spent}")
+edited_df.to_csv("expenses.csv", index=False, header=False)
 except FileNotFoundError:
     st.info(
         "💡 Abhi tak koi data save nahi hua hai. Upar form bhar kar pehla expense add karein!"
