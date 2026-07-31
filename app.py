@@ -37,17 +37,15 @@ st.header("📊 Expenses Summary")
 
 try:
     # CSV file se data read karna
-    df = pd.read_csv(
-        "expenses.csv", names=["Date", "Item", "Amount", "Category"]
-    )
-
+    df = pd.read_csv("expenses.csv", names=["Date", "Item", "Amount", "Category"])
     
-      # History Table
     edited_df = st.data_editor(df, num_rows="dynamic", use_container_width=True)
-total_spent = edited_df["Amount"].sum()
-st.metric(label="Total Spent", value=f"Rs. {total_spent}")
-edited_df.to_csv("expenses.csv", index=False, header=False)
+    
+    total_spent = edited_df["Amount"].sum()
+    st.metric(label="Total Spent", value=f"Rs. {total_spent}")
+
+    edited_df.to_csv("expenses.csv", index=False, header=False)
+
 except FileNotFoundError:
-    st.info(
-        "💡 Abhi tak koi data save nahi hua hai. Upar form bhar kar pehla expense add karein!"
-    )
+    st.info( "💡 Abhi tak koi data save nahi hua hai. Upar form bhar kar pehla expense add karein!")
+    
