@@ -1,71 +1,28 @@
 import pandas as pd
 import streamlit as st
-import streamlit_authenticator as stauth
 
-# --- 1. USER AUTHENTICATION CONFIGURATION ---
-# Plain passwords match karne ke liye direct config
-credentials = {
-    "usernames": {
-        "hira": {
-            "name": "Hira Anees",
-            "password": "hira123",
-        },
-        "guest": {
-            "name": "Guest User",
-            "password": "guest123",
-        },
-    }
-}
+st.set_page_config(page_title="Expense Tracker", page_icon="💸")
 
-# Create authenticator object
-authenticator = stauth.Authenticate(
-    credentials=credentials,
-    cookie_name="expense_tracker_cookie",
-    key="auth_key_12345",
-    cookie_expiry_days=30,
+# --- USER CREDENTIALS ---
+USERS = {"hira": "hira123", "guest": "guest123"}
+
+st.title("💸 Smart Expense Tracker")
+
+# Sidebar me Login Details
+st.sidebar.header("🔐 User Login")
+user_input = (
+    st.sidebar.text_input("Username", key="user_key").strip().lower()
+)
+pass_input = st.sidebar.text_input(
+    "Password", type="password", key="pass_key"
 )
 
-# Custom Login logic (bina library mismatch error ke)
-st.title("🔐 Login Page")
+# Login Verification
+if user_input in USERS and USERS[user_input] == pass_input:
+    st.sidebar.success(f"Welcome, {user_input.capitalize()}! 👋")
 
-with st.form("login_form"):
-    username_input = st.text_input("Username").strip().lower()
-    password_input = st.text_input("Password", type="password")
-    submit_login = st.form_submit_button("Login")
-
-    if submit_login:
-        users = credentials["usernames"]
-        if (
-            username_input in users
-            and users[username_input]["password"] == password_input
-        ):
-            st.session_state["authentication_status"] = True
-            st.session_state["username"] = username_input
-            st.session_state["name"] = users[username_input]["name"]
-            st.rerun()
-        else:
-            st.session_state["authentication_status"] = False
-            st.error("Username/password galat hai!")
-
-# Accessing login status
-authentication_status = st.session_state.get("authentication_status")
-username = st.session_state.get("username")
-name = st.session_state.get("name")
-
-# --- 2. LOGGED IN USER SECTION ---
-if authentication_status:
-
-    st.sidebar.write(f"Logged in as: **{name}**")
-    if st.sidebar.button("Logout"):
-        st.session_state["authentication_status"] = None
-        st.session_state["username"] = None
-        st.session_state["name"] = None
-        st.rerun()
-
-    # Har user ke liye ALAG CSV File ka naam
-    user_file = f"expenses_{username}.csv"
-
-    st.title(f"💸 Smart Expense Tracker - ({name})")
+    # Har user ki alag CSV File
+    user_file = f"expenses_{user_input}.csv"
 
     # --- EXPENSE INPUT FORM ---
     with st.form("expense_form"):
@@ -102,14 +59,13 @@ if authentication_status:
 
     st.divider()
 
-    # --- DISPLAY & EDIT USER'S OWN DATA ---
-    st.header("📊 Your Expenses Summary")
+    # --- DISPLAY & EDIT USER'S DATA ---
+    st.header(f"📊 {user_input.capitalize()}'s Expenses Summary")
 
     try:
         df = pd.read_csv(
             user_file, names=["Date", "Item", "Amount", "Category"]
         )
-
         edited_df = st.data_editor(
             df, num_rows="dynamic", use_container_width=True
         )
@@ -120,6 +76,10 @@ if authentication_status:
         edited_df.to_csv(user_file, index=False, header=False)
 
     except FileNotFoundError:
-        st.info(
-            "💡 Aapka koi data save nahi hai. Upar se pehla expense add karein!"
-        )
+        st.info("💡 Aapka koi data save nahi hai. Pehla expense add karein!")
+
+else:
+    if user_input or pass_input:
+        st.error("❌ Username ya Password galat hai!")
+    else:
+        st.info("👈 Left Sidebar me apna Username aur Password dalke login karein.")
