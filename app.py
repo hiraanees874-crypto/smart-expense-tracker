@@ -3,37 +3,28 @@ import streamlit as st
 import streamlit_authenticator as stauth
 
 # --- 1. USER AUTHENTICATION CONFIGURATION ---
-# Yahan aap naye users aur passwords add kar sakte hain
-names = ["Hira Anees", "Guest User"]
-usernames = ["hira", "guest"]
-
-# Hashed passwords (Example passwords: 'hira123' aur 'guest123')
-# Streamlit-authenticator requires plain passwords to be hashed
-passwords = ["hira123", "guest123"]
-hashed_passwords = stauth.Hasher(passwords).generate()
-
 credentials = {
     "usernames": {
-        usernames[0]: {
-            "name": names[0],
-            "password": hashed_passwords[0],
+        "hira": {
+            "name": "Hira Anees",
+            "password": "$2b$12$e68Y2U7WlW8jG0rD8JvMue.6H310/o/KzI/yEJuqL41dF/kG6YvK6",
         },
-        usernames[1]: {
-            "name": names[1],
-            "password": hashed_passwords[1],
+        "guest": {
+            "name": "Guest User",
+            "password": "$2b$12$Nq56m5jWpB7gC9v1L64M1e.7X1.j4T.qL2m4K/63F7Y6YvK6.Y1q.",
         },
     }
 }
 
 authenticator = stauth.Authenticate(
-    credentials,
-    "expense_tracker_cookie",
-    "auth_key_12345",
+    credentials=credentials,
+    cookie_name="expense_tracker_cookie",
+    key="auth_key_12345",
     cookie_expiry_days=30,
 )
 
 # Login Widget
-name, authentication_status, username = authenticator.login("Login", "main")
+name, authentication_status, username = authenticator.login("main")
 
 # --- 2. LOGIN CHECK ---
 if authentication_status == False:
