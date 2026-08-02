@@ -31,10 +31,10 @@ if user_input in USERS and USERS[user_input] == pass_input:
         st.subheader("💡 Features & Guide")
         st.markdown(
             """
-        * 📝 **Add Expense:** Form me date, item, amount aur category select karke apna kharcha add karein.
+        * 📝 **Add Expense:** Date, item, amount aur category select karke apna kharcha add karein.
+        * ✏️ **Custom Category:** Category me **'Other'** select karke aap apni marzi ka name (jaise: *Bank Loan*, *Solar Instalment*) likh sakte hain.
         * 📊 **Expense Summary:** Niche aapko apne saare kharchon ki list aur total amount dikhega.
-        * ✏️ **Edit & Delete Data:** Table par click karke aap kisi bhi entry ko change ya delete kar sakti hain.
-        * 🔐 **Personalized Data:** Aapka data sirf aapke login par hi save aur display hoga.
+        * ⚙️ **Edit & Delete:** Table par direct click karke kisi bhi entry ko edit ya delete karein.
         """
         )
 
@@ -53,15 +53,38 @@ if user_input in USERS and USERS[user_input] == pass_input:
             date = st.date_input("Date")
             item = st.text_input("Item Name")
             amount = st.number_input("Amount (Rs.)", min_value=0.0, step=10.0)
-            category = st.selectbox(
-                "Category", ["Food", "Transport", "Bills", "Shopping", "Other"]
+
+            # Category Selection
+            category_options = [
+                "Food",
+                "Transport",
+                "Bills",
+                "Shopping",
+                "Other",
+            ]
+            selected_category = st.selectbox("Category", category_options)
+
+            # Custom Category Input Box (Agar 'Other' Select karein)
+            custom_category = st.text_input(
+                "Specify Other Category (e.g. Bank Loan, Solar Instalment):"
             )
+
             submit = st.form_submit_button("Add Expense")
 
             if submit:
+                # Agar 'Other' chuna hai toh custom text lein, varna dropdown wali category
+                if selected_category == "Other":
+                    final_category = (
+                        custom_category.strip()
+                        if custom_category.strip() != ""
+                        else "Other"
+                    )
+                else:
+                    final_category = selected_category
+
                 if item.strip() != "":
                     new_data = pd.DataFrame(
-                        [[date, item, amount, category]],
+                        [[date, item, amount, final_category]],
                         columns=["Date", "Item", "Amount", "Category"],
                     )
                     try:
@@ -84,7 +107,7 @@ if user_input in USERS and USERS[user_input] == pass_input:
         st.divider()
 
         # Display Data & Summary
-        st.header(f"📊 Summary")
+        st.header("📊 Summary")
 
         try:
             df = pd.read_csv(
