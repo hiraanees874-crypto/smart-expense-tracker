@@ -24,7 +24,12 @@ authenticator = stauth.Authenticate(
 )
 
 # Login Widget
-name, authentication_status, username = authenticator.login("main")
+authenticator.login()
+
+# Session state se details lena
+name = st.session_state.get("name")
+authentication_status = st.session_state.get("authentication_status")
+username = st.session_state.get("username")
 
 # --- 2. LOGIN CHECK ---
 if authentication_status == False:
